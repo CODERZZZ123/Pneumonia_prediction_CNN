@@ -1,10 +1,11 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Conv2D, BatchNormalization, ReLU, Add, ZeroPadding2D, MaxPooling2D, AveragePooling2D, Flatten, Dense
+from tensorflow.keras.layers import Input, Conv2D, BatchNormalization, ReLU, Add, ZeroPadding2D, MaxPooling2D, AveragePooling2D, Flatten, Dense , Rescaling
 from tensorflow.keras.models import Model
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.preprocessing import image_dataset_from_directory
+from tensorflow.keras.preprocessing import image
 import matplotlib.pyplot as plt
 import os
 
@@ -64,6 +65,7 @@ class ResNet50Model:
 
     def build_model(self, training=False):
         X_input = Input(self.input_shape)
+        X_input = Rescaling(scale=1./255)(X_input)
         X_input = self._data_augmentation()(X_input)
 
         X = ZeroPadding2D((3, 3))(X_input)
@@ -136,30 +138,64 @@ def main():
 
     BATCH_SIZE = 4
     IMG_SIZE = (64, 64)
-    directory = "data/chest_xray/train/"
-    train_dataset = image_dataset_from_directory(directory,
-                                                shuffle=True,
-                                                batch_size=BATCH_SIZE,
-                                                image_size=IMG_SIZE,
-                                                validation_split=0.2,
-                                                subset='training',
-                                                seed=42)
-    validation_dataset = image_dataset_from_directory(directory,
-                                                shuffle=True,
-                                                batch_size=BATCH_SIZE,
-                                                image_size=IMG_SIZE,
-                                                validation_split=0.2,
-                                                subset='validation',
-                                             seed=42)
+    # directory = "data/chest_xray/train/"
+    # train_dataset = image_dataset_from_directory(directory,
+    #                                             shuffle=True,
+    #                                             batch_size=BATCH_SIZE,
+    #                                             image_size=IMG_SIZE,
+    #                                             validation_split=0.2,
+    #                                             subset='training',
+    #                                             seed=42)
+    # validation_dataset = image_dataset_from_directory(directory,
+    #                                             shuffle=True,
+    #                                             batch_size=BATCH_SIZE,
+    #                                             image_size=IMG_SIZE,
+    #                                             validation_split=0.2,
+    #                                             subset='validation',
+    #                                          seed=42)
 
-    class_names = train_dataset.class_names
+    # class_names = train_dataset.class_names
 
-    resnet_model = ResNet50Model(input_shape=(64, 64, 3), classes=len(class_names))
-    model = resnet_model.build_model(training=True)
+    # resnet_model = ResNet50Model(input_shape=(64, 64, 3), classes=len(class_names))
+    # model = resnet_model.build_model(training=True)
 
-    trained_model, training_history = train_model(model, train_dataset, validation_dataset)
+    # trained_model, training_history = train_model(model, train_dataset, validation_dataset)
 
-    # Visualize training history, etc.
+    # trained_model.save("path/to/save/model_resnet_pneumonia")
+
+  
+
+    # # Load the SavedModel from the .pb file
+    # trained_model = tf.saved_model.load('path/to/save/model_resnet_pnemonia')
+    # # print(trained_model.__class__)
+
+
+    # Load the trained model
+    model = tf.keras.models.load_model("path/to/save/model_resnet_pneumonia")
+
+    # Define the class names
+    class_names = ["normal", "bacteria_pneumonia", "virus_pneumonia"]  # Replace with your actual class names
+
+    # Load and preprocess an example image for prediction
+    img_path = "data/chest_xray/train/pneumonia_virus/person1642_virus_2842.jpeg"
+    img = image.load_img(img_path, target_size=(64, 64))  # Adjust the target_size based on your model input size
+    img_array = image.img_to_array(img)
+    img_array = np.expand_dims(img_array, axis=0)
+    img_array /= 255.0  # Normalize pixel values to the range [0, 1]
+
+    # Make predictions
+    predictions = model.predict(img_array)
+
+    # Get the predicted class index
+    predicted_class_index = np.argmax(predictions[0])
+
+    # Get the predicted class label
+    predicted_class_label = class_names[predicted_class_index]
+
+    # Print the predicted class label
+    print("Predicted class:", predicted_class_label)
+
+    
 
 if __name__ == "__main__":
     main()
