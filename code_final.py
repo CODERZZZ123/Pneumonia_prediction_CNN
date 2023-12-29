@@ -195,8 +195,6 @@ def main():
     # Print the predicted class label
     print("Predicted class:", predicted_class_label)
 
-    
-
 if __name__ == "__main__":
     main()
 

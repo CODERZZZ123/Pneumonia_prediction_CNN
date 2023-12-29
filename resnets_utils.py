@@ -7,7 +7,6 @@ import math
 from keras.layers import Layer
 
 class BatchNormalization(Layer):
-    # Code from: https://github.com/dksakkos/BatchNorm
     def __init__(self, 
                  axis=-1, 
                  momentum=0.90, 
@@ -17,7 +16,6 @@ class BatchNormalization(Layer):
         super().__init__(name=name, **kwargs)
         self.axis = axis
         self.momentum = momentum 
-        #super(BatchNormalization, self).__init__()
 
     def build(self, input_shape):
         self.beta = self.add_weight(

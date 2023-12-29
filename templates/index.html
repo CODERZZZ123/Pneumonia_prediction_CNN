@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResNet Image Classification</title>
+    <style>
+        body {
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        img {
+            display: block;
+            margin: 20px auto;
+            max-width: 100%;
+            width: 20%; /* Adjust the width as needed */
+            height: auto;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        p {
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+    <h1>ResNet Image Classification</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".png, .jpg, .jpeg" required>
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if prediction %}
+        <h2>Uploaded Image</h2>
+        <img src="data:image/jpeg;base64,{{ image }}" alt="Uploaded Image">
+        <h2>Prediction</h2>
+        <p>{{ prediction }}</p>
+    {% endif %}
+</body>
+</html>
